@@ -7,15 +7,16 @@
 #include <time.h>
 
 int longueur_min_salle = 5;
-int longueur_max_salle = 5;
-int largeur_min_salle = 20;
+int longueur_max_salle = 20;
+
+int largeur_min_salle = 5;
 int largeur_max_salle = 20;
 
 pos_salle **initSalle(int longueur, int largeur, char *type_salle)
 {
-    if (longueur <= 2 || largeur <= 2)
+    if (longueur < 5 || largeur < 5)
     {
-        printf("La longueur et la largeur de la salle doivent être supérieures à 2.\n");
+        printf("La longueur et la largeur de la salle doivent être supérieures à 6.\n");
         return NULL;
     }
 
@@ -79,11 +80,24 @@ pos_salle **remplirSalle(int seed)
 
 void libererMemoire(pos_salle **salle, int longueur)
 {
+    //On libère chaque ligne
     for (int i = 0; i < longueur; i++)
     {
         free(salle[i]);
     }
+    //Puis on finit par le tableau contenant toutes les lignes
     free(salle);
+}
+
+void libererMemoireTableau(pos_salle ***salles, int longueur, int nombre_de_salles)
+{
+    // On libère la mémoire de chaque salle contenu dans le tableau
+    for (int i = 0; i < nombre_de_salles; i++)
+    {
+        libererMemoire(salles[i], longueur);
+    }
+    // Puis on libère le tableau contenant les salles
+    free(salles);
 }
 
 void insererSalle(pos_salle **donjon, pos_salle **salle, int pos_larg, int pos_lon)
@@ -117,14 +131,10 @@ pos_salle **remplirDonjon(pos_salle **donjon, pos_salle ***salles, int nombres_s
                 {
                     insererSalle(donjon, salles[quelle_salle], cpt_larg, cpt_lon);
                 }
-
-                // afficherSalle(donjon);
-                /*
-                char d;
-                printf("Appuyez sur entrer pour continuer.");
-                // Deux scanf à cause du dernier \n
-                scanf("%c", &d);
-                scanf("%c", &d); //*/
+                else if(est_libre(salles[quelle_salle], donjon, &cpt_larg, &cpt_lon) == 1){
+                    cpt_lon += salles[quelle_salle][0][0].longueur;
+                    break; 
+                }
             }
         }
     }

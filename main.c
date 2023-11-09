@@ -7,6 +7,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+void pause(){
+    char d;
+    printf("Appuyez sur entrer pour fermer la fenêtre.");
+    // Deux scanf à cause du dernier \n
+    scanf("%c", &d);
+    scanf("%c", &d);
+}
+
 int main()
 {
     int longueur, largeur, nombre_de_salles;
@@ -29,25 +37,18 @@ int main()
     {
         salles[i] = remplirSalle(seed);
     }
-
+    
     donjon = remplirDonjon(donjon, salles, nombre_de_salles);
 
     //  Afficher la salle
     afficherSalle(donjon);
 
-    printf("%c", donjon[0][0].type);
-    char d;
-    printf("Appuyez sur entrer pour fermer la fenêtre.");
-    // Deux scanf à cause du dernier \n
-    scanf("%c", &d);
-    scanf("%c", &d);
+    //On met le programme en pause pour éviter qu'il se ferme tout seul
+    pause();
 
     // Libérer la mémoire allouée
     libererMemoire(donjon, longueur);
-    for (int i = 0; i < nombre_de_salles; i++)
-    {
-        libererMemoire(salles[i], nombre_de_salles);
-    }
-    free(salles); //*/
+    libererMemoireTableau(salles, longueur, nombre_de_salles);
+
     return 0;
 }

@@ -1,5 +1,6 @@
 #include "tests.h"
 #include <stdio.h>
+
 int lettresAdjacentes(pos_salle **salle, char lettre, int pos_lon, int pos_larg)
 {
     if (salle[pos_lon - 1][pos_larg].icone == lettre || salle[pos_lon][pos_larg - 1].icone == lettre || salle[pos_lon + 1][pos_larg].icone == lettre || salle[pos_lon][pos_larg + 1].icone == lettre)
@@ -9,17 +10,35 @@ int lettresAdjacentes(pos_salle **salle, char lettre, int pos_lon, int pos_larg)
     return 0;
 }
 
+void permuterLettres(pos_salle** donjon, char lettre_a_changer, char nv_lettre, int pos_lon, int pos_larg){
+    if (donjon[pos_lon - 1][pos_larg].icone == lettre_a_changer){
+        donjon[pos_lon - 1][pos_larg].icone = nv_lettre;
+    }
+    if (donjon[pos_lon][pos_larg - 1].icone == lettre_a_changer){
+        donjon[pos_lon][pos_larg - 1].icone = nv_lettre;
+    }
+    if (donjon[pos_lon + 1][pos_larg].icone == lettre_a_changer){
+        donjon[pos_lon + 1][pos_larg].icone = nv_lettre;
+    }
+    if (donjon[pos_lon][pos_larg + 1].icone == lettre_a_changer){
+        donjon[pos_lon][pos_larg + 1].icone = nv_lettre;
+    }
+}
+
 char quelle_lettre(int code_lettre, pos_salle **salle, int cpt_lon, int cpt_larg, int *champion_place)
 {
     char lettres[5] = {'M', 'C', 'B', 'A', 'P'}; // Tableau de taille 5, contenant les possibilités
     if (code_lettre < 5)                         // 5 car c'est la taille du tableau contenant toutes les lettres
     {
-        if (code_lettre != 2) // Si le monstre n'est pas le champion, on procède normalement
+        if (lettres[code_lettre] != 'B') // Si le monstre n'est pas le champion, on procède normalement
         {
             // Vérifie que le monstre qu'on tente de placer n'est pas à côté d'un piège
-            if (code_lettre == 0 && lettresAdjacentes(salle, 'P', cpt_lon, cpt_larg) == 1)
+            if (lettres[code_lettre] == 'M' && lettresAdjacentes(salle, 'P', cpt_lon, cpt_larg) == 1)
             {
                 return 'W';
+            }
+            if (lettres[code_lettre] == 'P'){
+                permuterLettres(salle, lettres[code_lettre], 'W',  cpt_lon,  cpt_larg);
             }
             else
                 return lettres[code_lettre];
@@ -45,7 +64,6 @@ int est_libre(pos_salle **salle, pos_salle **donjon, int *pos_larg, int *pos_lon
             {
                 if ((donjon[*pos_lon + cpt_lon][*pos_larg + cpt_larg]).icone == '#')
                 {
-
                     // Change pos_larg par la valeur (soit la position) +1 pour décaler la boucle, et ne pas tester stupidement
                     *pos_larg = donjon[*pos_lon + cpt_lon][*pos_larg + cpt_larg].largeur + *pos_larg + cpt_larg + 1;
                     // Renvoie 1 pour signaler que l'emplacement n'est pas libre
@@ -54,10 +72,6 @@ int est_libre(pos_salle **salle, pos_salle **donjon, int *pos_larg, int *pos_lon
             }
         }
         return 0;
-    }
-    else
-    {
-        //*pos_larg = 1;
     }
     return 1;
 }
