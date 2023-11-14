@@ -80,12 +80,12 @@ pos_salle **remplirSalle(int seed)
 
 void libererMemoire(pos_salle **salle, int longueur)
 {
-    //On libère chaque ligne
+    // On libère chaque ligne
     for (int i = 0; i < longueur; i++)
     {
         free(salle[i]);
     }
-    //Puis on finit par le tableau contenant toutes les lignes
+    // Puis on finit par le tableau contenant toutes les lignes
     free(salle);
 }
 
@@ -131,12 +131,83 @@ pos_salle **remplirDonjon(pos_salle **donjon, pos_salle ***salles, int nombres_s
                 {
                     insererSalle(donjon, salles[quelle_salle], cpt_larg, cpt_lon);
                 }
-                else if(est_libre(salles[quelle_salle], donjon, &cpt_larg, &cpt_lon) == 1){
+                else if (est_libre(salles[quelle_salle], donjon, &cpt_larg, &cpt_lon) == 1)
+                {
                     cpt_lon += salles[quelle_salle][0][0].longueur;
-                    break; 
+                    break;
                 }
             }
         }
     }
     return donjon;
+}
+
+pos_salle **remplirSalle_man(int seed, int nb_type_salle, int combien_obj_speciaux, int presence_monstres)
+{
+    // Initialise la salle selon des dimensions aléatoires entre 3 et 10
+    pos_salle **salle;
+    int champion_place = 0; // Booléen pour savoir si LE champion a été placé
+    srand(seed);
+    int longueur = longueur_min_salle + (rand() % longueur_max_salle);
+    int largeur = largeur_min_salle + (rand() % largeur_max_salle);
+    int cpt = 0;
+    salle = initSalle(longueur, largeur, "salle");
+
+    // Remplit semi-aléatoirement la salle ou manuellement
+    for (int cpt_lon = 1; cpt_lon < salle[0][0].longueur - 1; cpt_lon++)
+    {
+        for (int cpt_larg = 1; cpt_larg < salle[0][0].largeur - 1; cpt_larg++) // on initialise à 1 et les dimensions max -1 pour rester dans le cadre et ne pas dépasser
+        {
+            int code_lettre = 0 + (rand() % 50); // Génère un nombre entre 0 et 50
+            if (code_lettre == 0 && presence_monstres == 1)
+            {
+                salle[cpt_lon][cpt_larg].icone = quelle_lettre(code_lettre, salle, cpt_lon, cpt_larg, &champion_place);
+            }
+            else if (code_lettre == nb_type_salle && combien_obj_speciaux > cpt)
+            {
+                salle[cpt_lon][cpt_larg].icone = quelle_lettre(code_lettre, salle, cpt_lon, cpt_larg, &champion_place);
+                cpt++;
+            }
+        }
+    }
+    return salle;
+}
+
+pos_salle **remplirDonjon_man(pos_salle **donjon, pos_salle ***salles, int nombres_salles)
+{
+    int continuer = 1;
+    int longueur, largeur, quelle_salle;
+    while (continuer == 1)
+    {
+        afficherSalle(donjon);
+        printf("Quelle salle ? (utilisez un nombre entre 0 et %d)\n", nombres_salles - 1);
+        scanf("%d", quelle_salle);
+
+        if (quelle_salle >= 0 && quelle_salle < nombres_salles)
+        {
+            printf("Où souhaitez-vous placer une salle ?\n");
+            printf("Colonne :");
+            scanf("%d", &largeur);
+            printf("Ligne");
+            scanf("%d", &longueur);
+
+            {
+                if (est_libre(salles[quelle_salle], donjon, &largeur, &longueur) == 0)
+                {
+                    insererSalle(donjon, salles[quelle_salle], largeur, longueur);
+                }
+                else
+                {
+                    printf("Position invalide. Continuer ?\n 1)Oui\n Autre)Non");
+                    scanf("%d", &continuer);
+                }
+            }
+        }
+        else
+        {
+            printf("Mauvaise valeur, veuillez utiliser un nombre entre 0 et %d ", nombres_salles - 1);
+            scanf("%d", quelle_salle);
+        }
+        return donjon;
+    }
 }
