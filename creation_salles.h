@@ -16,6 +16,12 @@ typedef struct
 } pos_salle;
 
 /**
+ * \brief met en pause le programme jusqu'à ce que l'utilisateur appuie sur entrée
+ *
+ */
+void pause();
+
+/**
  * \brief initialise une boîte avec juste des murs "#" et " " pour les espaces vides
  *
  * \param largeur : largeur du tableau (taille des sous-tableaux) --
@@ -66,11 +72,19 @@ pos_salle **remplirDonjon(pos_salle **donjon, pos_salle ***salles, int nombre_sa
  *
  * \param
  */
-pos_salle **remplirSalle_man(int seed, int nb_type_salle, int combien_obj_speciaux, int presence_monstres);
+pos_salle **remplirSalle_man();
+
 /**
  * \brief
  *
  * \param
  */
 pos_salle **remplirDonjon_man(pos_salle **donjon, pos_salle ***salles, int nombres_salles);
+
+/**
+ * \brief
+ *
+ * \param
+ */
+char placement_lettre(pos_salle **salle, char lettre, int pos_lon, int pos_larg);
 #endif

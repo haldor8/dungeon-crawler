@@ -7,91 +7,91 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void pause()
+
+pos_salle ***menu_remplir_salles(int seed, pos_salle ***salles, int nombre_de_salles)
 {
-    char d;
-    printf("Appuyez sur entrer pour fermer la fenêtre.");
-    // Deux scanf à cause du dernier \n
-    scanf("%c", &d);
-    scanf("%c", &d);
-}
-
-pos_salle **menu_donjon(pos_salle **donjon)
-{
-}
-
-int main()
-{
-    int longueur, largeur, nombre_de_salles;
-    int est_auto;
-    int seed = (int)time(NULL);
-    // Demander à l'utilisateur la longueur et la largeur du salle
-    printf("Entrez la longueur du salle : ");
-    scanf("%d", &longueur);
-    printf("Entrez la largeur du salle : ");
-    scanf("%d", &largeur);
-    printf("Entrez le nombres de salles : ");
-    scanf("%d", &nombre_de_salles);
-
-    printf("Souhaitez-vous remplir le donjon\n 1 : manuellement\n 2) automatiquement");
-    scanf("%d", &est_auto);
-
-    // On génère un donjon en spécifiant que c'est un donjon pour se retrouver plus facilement dans les tests
-    pos_salle **donjon = initSalle(longueur, largeur, "donjon");
-    // On génère un tableaux de salles pour faire différentes salles
-    pos_salle ***salles = (pos_salle ***)malloc(nombre_de_salles * sizeof(pos_salle **));
-
-    if (est_auto == 2)
-    {
-        for (int i = 0; i < nombre_de_salles; i++)
-        {
-            salles[i] = remplirSalle(seed);
-        }
-        donjon = remplirDonjon(donjon, salles, nombre_de_salles);
-    }
-    else if (est_auto == 1)
-    {
         int cpt = 0;
-        int type_salle, combien_obj_speciaux, presence_monstres;
+        int est_salle_man;
         pos_salle **salle_temp;
+
+        printf("Souhaitez-vous remplir les salles\n 1) Manuellement\n Autre) Aleatoirement ");
+        scanf("%d", &est_salle_man);
+
         while (cpt < nombre_de_salles)
         {
-            printf("Quel type de salle cela doit être ?\n 1)Coffre\n 2)Boss\n 3)Autel\n 4)Salle piégée");
-            scanf("%d", &type_salle);
+            if(est_salle_man == 1){
+                salle_temp = remplirSalle_man();
+            }
+            else{
+                salle_temp = remplirSalle(seed);
+            }
 
-            printf("Combien d'objets ou monstres spéciaux doit-il y avoir dans cette salle ?");
-            scanf("%d", &combien_obj_speciaux);
-
-            printf("Est-ce qu'il y a des monstres ?\n 1)Oui\n Autre)Non");
-            scanf("%d", &presence_monstres);
-
-            salle_temp = remplirSalle_man(seed, type_salle, combien_obj_speciaux, presence_monstres);
-            int conserve;
+            int conserve = 0;
             afficherSalle(salle_temp);
             printf("Souhaitez-vous conserver cette salle ?\n 1)Oui\n Autre : non");
             scanf("%d", &conserve);
+
             if (conserve == 1)
             {
                 salles[cpt] = salle_temp;
                 cpt++;
             }
         }
+    return salles;
+}
+
+
+int main()
+{
+    int seed = (int)time(NULL);
+    int longueur, largeur;
+    int est_donjon_man, nombre_de_salles;
+
+   // Demander à l'utilisateur la longueur et la largeur du donjon
+    printf("Entrez la longueur du donjon : ");
+    scanf("%d", &longueur);
+    printf("Entrez la largeur du donjon : ");
+    scanf("%d", &largeur);
+    printf("Entrez le nombre de salles : ");
+    scanf("%d", &nombre_de_salles); 
+
+    // On génère un donjon en spécifiant que c'est un donjon pour se retrouver plus facilement dans les tests
+    pos_salle **donjon = initSalle(longueur, largeur, "donjon");
+    // On génère un tableaux de salles pour faire différentes salles
+    pos_salle ***salles = (pos_salle ***)malloc((nombre_de_salles) * sizeof(pos_salle **));
+    
+
+    printf("Souhaitez-vous remplir le donjon\n 1) Manuellement\n Autre) Automatiquement ");
+    scanf("%d", &est_donjon_man);
+
+    if (est_donjon_man == 1)
+    {   
+        salles = menu_remplir_salles(seed, salles, nombre_de_salles);
         donjon = remplirDonjon_man(donjon, salles, nombre_de_salles);
     }
-
+    else if (est_donjon_man == 2)
+    {
+        salles = menu_remplir_salles(seed, salles, nombre_de_salles);
+        donjon = remplirDonjon(donjon, salles, nombre_de_salles);
+    }
     else
     {
         printf("Nombre invalide, recommencez");
         printf("Souhaitez-vous remplir le donjon\n 1 : manuellement\n 2) automatiquement");
-        scanf("%d", &est_auto);
+        scanf("%d", &est_donjon_man);
     }
-    //  Afficher la salle
+    
+
+
+    //  Afficher le donjon
     afficherSalle(donjon);
 
     // On met le programme en pause pour éviter qu'il se ferme tout seul
     pause();
-    // Libérer la mémoire allouée
+
+    // Libérer la mémoire allouée pour le donjon
     libererMemoire(donjon, longueur);
+    // On libère la mémoire allouée à la liste de tableaux contenant les salles
     libererMemoireTableau(salles, longueur, nombre_de_salles);
 
     return 0;
